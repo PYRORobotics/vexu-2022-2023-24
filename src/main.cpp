@@ -85,7 +85,7 @@ void opcontrol() {
 	pros::Motor rightf_mtr(18);
 	pros::Motor rightb_mtr(20);
 	pros::Motor leftb_mtr(12);
-	
+	int pow;
 
 	while (true) {
 		pros::lcd::print(0, "%d %d %d", (pros::lcd::read_buttons() & LCD_BTN_LEFT) >> 2,
@@ -93,12 +93,18 @@ void opcontrol() {
 		                 (pros::lcd::read_buttons() & LCD_BTN_RIGHT) >> 0);
 		int leftY = master.get_analog(ANALOG_LEFT_Y);
 		int leftX = master.get_analog(ANALOG_LEFT_X);
-		int rightX = master.get_analog(ANALOG_LEFT_X);
+		int rightX = master.get_analog(ANALOG_RIGHT_X);
 
-		leftf_mtr = -((leftY - leftX));
-		rightf_mtr = ((leftY + leftX));
-		leftb_mtr = -((leftY + leftX));
-		rightb_mtr = ((leftY - leftX));
+		if(master.get_digital(DIGITAL_L2)){
+			pow = ((leftY + leftX) / 2) + (rightX / 2);
+		} else {
+			pow = ((leftY + leftX)) + rightX;
+		}
+		leftf_mtr = pow;
+		rightf_mtr = -pow;
+		leftb_mtr = pow;
+		rightb_mtr = -pow;
+		
 
 		pros::delay(20);
 	}
