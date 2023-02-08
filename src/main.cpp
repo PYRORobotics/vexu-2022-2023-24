@@ -81,77 +81,25 @@ void autonomous() {}
  */
 void opcontrol() {
 	pros::Controller master(pros::E_CONTROLLER_MASTER);
-	pros::Motor left_mtr_front(18, true);
-	pros::Motor right_mtr_front(13);
-	pros::Motor left_mtr_mid(17);
-	pros::Motor right_mtr_mid(14, true);
-	pros::Motor left_mtr_back(16, true);
-	pros::Motor right_mtr_back(15);
-	pros::Motor right_intake (1, true);
-	pros::Motor left_intake (2);
-	pros::Motor catapult_left (10, true);
-	pros::Motor catapult_right (9);
-
-	double velocity_control = 1;
-
-	pros::ADIDigitalIn limit_switch('B');
-	pros::c::adi_pin_mode('B', INPUT);
-
-	pros::Motor_Group right_side ({right_mtr_front,right_mtr_mid,right_mtr_back});
-	pros::Motor_Group left_side ({left_mtr_front,left_mtr_mid,left_mtr_back});
-	pros::Motor_Group catapult ({catapult_left, catapult_right});
-	catapult.set_brake_modes(pros::E_MOTOR_BRAKE_HOLD);
-	catapult.set_gearing(pros::E_MOTOR_GEAR_RED);
-
-	bool catapult_button_pressed = false;
-
-
-
+	pros::Motor leftf_mtr(13);
+	pros::Motor rightf_mtr(18);
+	pros::Motor rightb_mtr(20);
+	pros::Motor leftb_mtr(12);
+	
 
 	while (true) {
 		pros::lcd::print(0, "%d %d %d", (pros::lcd::read_buttons() & LCD_BTN_LEFT) >> 2,
 		                 (pros::lcd::read_buttons() & LCD_BTN_CENTER) >> 1,
 		                 (pros::lcd::read_buttons() & LCD_BTN_RIGHT) >> 0);
-		int forward = master.get_analog(ANALOG_LEFT_Y);
-		int turn = master.get_analog(ANALOG_LEFT_X);
+		int leftY = master.get_analog(ANALOG_LEFT_Y);
+		int leftX = master.get_analog(ANALOG_LEFT_X);
+		int rightX = master.get_analog(ANALOG_LEFT_X);
 
-		left_side = (forward + turn) * velocity_control;
-		right_side = (forward - turn) * velocity_control;
+		leftf_mtr = -((leftY - leftX));
+		rightf_mtr = ((leftY + leftX));
+		leftb_mtr = -((leftY + leftX));
+		rightb_mtr = ((leftY - leftX));
+
 		pros::delay(20);
-
-
-
-		if (master.get_digital(pros::E_CONTROLLER_DIGITAL_L2)){
-
-				velocity_control = 0.5;
-
-		}
-		else {
-
-				velocity_control = 1;
-
-		}
-
-		if(master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_R1)) {
-			catapult_button_pressed = true;
-		}
-
-		if(master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_R2)) {
-			catapult.move_relative(5000, 60);
-		}
-
-		if(master.get_digital(pros::E_CONTROLLER_DIGITAL_R2)){
-
-		}
-		else if(catapult_button_pressed && !limit_switch.get_value()) {
-			catapult.move_velocity(75);
-		}
-		else {
-			catapult.move_velocity(0);
-			catapult_button_pressed = false;
-		}
-
-
-		
 	}
 }
