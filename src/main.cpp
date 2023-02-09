@@ -5,6 +5,8 @@
 #include "pros/misc.h"
 #include "pros/motors.h"
 #include "pros/motors.hpp"
+#include "RobotConfig.h"
+#include "RobotMove.h"
 
 /**
  * A callback function for LLEMU's center button.
@@ -81,12 +83,8 @@ void autonomous() {}
  */
 void opcontrol() {
 	pros::Controller master(pros::E_CONTROLLER_MASTER);
-	pros::Motor leftf_mtr(13);
-	pros::Motor rightf_mtr(18);
-	pros::Motor rightb_mtr(20);
-	pros::Motor leftb_mtr(12);
-	int pow;
-
+	RobotMove robotMove;
+	bool reversed = false;
 	while (true) {
 		pros::lcd::print(0, "%d %d %d", (pros::lcd::read_buttons() & LCD_BTN_LEFT) >> 2,
 		                 (pros::lcd::read_buttons() & LCD_BTN_CENTER) >> 1,
@@ -96,15 +94,16 @@ void opcontrol() {
 		int rightX = master.get_analog(ANALOG_RIGHT_X);
 
 		if(master.get_digital(DIGITAL_L2)){
-			pow = ((leftY + leftX) / 2) + (rightX / 2);
+			robotMove.raw_tank(leftY , rightX, leftX , .5, reversed);
+			//pow = ((leftY + leftX) / 2) + (rightX / 2);
 		} else {
-			pow = ((leftY + leftX)) + rightX;
+			robotMove.raw_tank(leftY , rightX, leftX, reversed);
+			//pow = ((leftY + leftX)) + rightX;
 		}
-		leftf_mtr = pow;
-		rightf_mtr = -pow;
-		leftb_mtr = pow;
-		rightb_mtr = -pow;
 		
+		if (master.get_digital_new_press(DIGITAL_L1)) {
+			reversed = !reversed;
+		}
 
 		pros::delay(20);
 	}
