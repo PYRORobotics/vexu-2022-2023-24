@@ -66,7 +66,9 @@ void competition_initialize() {}
  * will be stopped. Re-enabling the robot will restart the task, not re-start it
  * from where it left off.
  */
-void autonomous() {}
+void autonomous() {
+
+}
 
 /**
  * Runs the operator control code. This function will be started in its own task
@@ -94,11 +96,9 @@ void opcontrol() {
 		int rightX = master.get_analog(ANALOG_RIGHT_X);
 
 		if(master.get_digital(DIGITAL_L2)){
-			robotMove.raw_tank(leftY , rightX, leftX , .5, reversed);
-			//pow = ((leftY + leftX) / 2) + (rightX / 2);
+			robotMove.raw_tank(leftY , rightX, reversed);
 		} else {
-			robotMove.raw_tank(leftY , rightX, leftX, reversed);
-			//pow = ((leftY + leftX)) + rightX;
+			robotMove.raw_tank(leftY , rightX, reversed);
 		}
 		
 		if (master.get_digital_new_press(DIGITAL_L1)) {
